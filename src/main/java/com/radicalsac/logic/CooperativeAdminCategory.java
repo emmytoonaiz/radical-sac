@@ -213,24 +213,25 @@ public class CooperativeAdminCategory {
 
             MemberProfile coop_member_hib = new MemberProfile();//replace with query to get cooperative member by Id
             coop_member_hib.setParticipating(false);
-            boolean closed = false;
+            boolean suspend = false;
+            //monitor part to be handled separately
 
-            if (closed) {
+            if (suspend) {
                 resp.setRetn(0);
-                resp.setDesc("Cooperative member account closed successfully.");
-                logger.info("Cooperative member account closed successfully. [{}] ", login.getUsername());
+                resp.setDesc("Cooperative member account suspended successfully.");
+                logger.info("Cooperative member account suspended successfully. [{}] ", login.getUsername());
                 return resp;
             }
             resp.setRetn(300);
-            resp.setDesc("Unable to close cooperative member account.");
-            logger.info("Unable to close cooperative member account. [{}] ", login.getUsername());
+            resp.setDesc("Unable to suspend cooperative member account.");
+            logger.info("Unable to suspend cooperative member account. [{}] ", login.getUsername());
             return resp;
 
         } catch (Exception ex) {
             resp.setRetn(99);
-            resp.setDesc("General Error: Unable to close cooperative member account. Contact system administrator." + "\nMessage: " + ex.getMessage());
-            logger.info("Error closing cooperative member account. See error log. [{}] - [{}]", resp.getRetn(), login.getUsername());
-            logger.error("Error closing cooperative member account- [" + login.getUsername() + "]", ex);
+            resp.setDesc("General Error: Unable to suspend cooperative member account. Contact system administrator." + "\nMessage: " + ex.getMessage());
+            logger.info("Error closing cooperative suspend account. See error log. [{}] - [{}]", resp.getRetn(), login.getUsername());
+            logger.error("Error closing cooperative suspend account- [" + login.getUsername() + "]", ex);
             return resp;
         }
     }
@@ -381,10 +382,10 @@ public class CooperativeAdminCategory {
                 logger.info("The specified cooperative member [{}] does not exist, please contact system administrator. [{}] ", memberSavings.getMemberAccountId(), login.getUsername());
                 return resp;
             }
-            if (!true) {//replace with checkCooperativeExist(cooperativeId)
+            if (!true) {//replace with checkSavingsTypeExist(cooperativeId)
                 resp.setRetn(301);
                 resp.setDesc("The specified savings type does not exist, please contact system administrator.");
-                logger.info("The specified savings type [{}] does not exist, please contact system administrator. [{}] ", memberSavings.getMemberAccountId(), login.getUsername());
+                logger.info("The specified savings type [{}] does not exist, please contact system administrator. [{}] ", memberSavings.getSavingsTypeId(), login.getUsername());
                 return resp;
             }
             if (!true) {//replace with check for if member has the savings type
@@ -805,6 +806,54 @@ public class CooperativeAdminCategory {
             resp.setDesc("General Error: Unable to query member withdrawal. Contact system administrator." + "\nMessage: " + ex.getMessage());
             logger.info("Error querying member withdrawal. See error log. [{}] - [{}]", resp.getRetn(), login.getUsername());
             logger.error("Error querying member withdrawal - [" + login.getUsername() + "]", ex);
+            return resp;
+        }
+    }
+
+    /**
+     * Request to un-suspend cooperative member account
+     *
+     * @param login the logged in user
+     * @param memberAccountId the cooperative member ID
+     * @return response to un-suspend member account request
+     */
+    public Response unSuspendMemberAccount_Request(UserAuth login, int memberAccountId) {
+        Response resp = new Response();
+        logger.info("Request to suspend cooperative member account, invoked by [{}]", login.getUsername());
+        try {
+            if (!true) {//replace with checkCooperativeExist(cooperativeId)
+                resp.setRetn(301);
+                resp.setDesc("The specified cooperative member does not exist, please contact system administrator.");
+                logger.info("The specified cooperative member [{}] does not exist, please contact system administrator. [{}] ", memberAccountId, login.getUsername());
+                return resp;
+            }
+            if (!true) {//replace with checkIfAccountIsSuspended
+                resp.setRetn(301);
+                resp.setDesc("The specified member account is not on suspension, action cancelled.");
+                logger.info("The specified member account [{}], is not on suspension, action cancelled. [{}] ", memberAccountId, login.getUsername());
+                return resp;
+            }
+
+            MemberProfile coop_member_hib = new MemberProfile();//replace with query to get cooperative member by Id
+            coop_member_hib.setParticipating(false);//change to suspension status
+            boolean unSuspend = false;
+
+            if (unSuspend) {
+                resp.setRetn(0);
+                resp.setDesc("Cooperative member account un-suspended successfully.");
+                logger.info("Cooperative member account un-suspended successfully. [{}] ", login.getUsername());
+                return resp;
+            }
+            resp.setRetn(300);
+            resp.setDesc("Unable to un-suspend cooperative member account.");
+            logger.info("Unable to un-suspend cooperative member account. [{}] ", login.getUsername());
+            return resp;
+
+        } catch (Exception ex) {
+            resp.setRetn(99);
+            resp.setDesc("General Error: Unable to un-suspend cooperative member account. Contact system administrator." + "\nMessage: " + ex.getMessage());
+            logger.info("Error closing cooperative un-suspend account. See error log. [{}] - [{}]", resp.getRetn(), login.getUsername());
+            logger.error("Error closing cooperative un-suspend account- [" + login.getUsername() + "]", ex);
             return resp;
         }
     }

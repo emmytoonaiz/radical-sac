@@ -15,17 +15,22 @@ public class CooperativeLicenceActivation {
     private int cooperativeId;
     private String cooperativeName;
     private String licenceInformation;
-    private String licenceStartDate;
-    private String licenceEndDate;
-     private int periodTyped;
-    private String licencePeriod;
-    private String licenceDuration;
-    private String licenceInPerpetuity;
-    private boolean save;
-    private boolean activate;
-    private boolean deactivate;
+    private String startDate;
+    private String endDate;
+    private int periodTypeId;
+    private String period;
+    private int duration;
+    private boolean inPerpetuity;
 
     public CooperativeLicenceActivation() {
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
     public int getCooperativeId() {
@@ -52,77 +57,51 @@ public class CooperativeLicenceActivation {
         this.licenceInformation = licenceInformation;
     }
 
-    public String getLicenceStartDate() {
-        return licenceStartDate;
+    public String getStartDate() {
+        return startDate;
     }
 
-    public void setLicenceStartDate(String licenceStartDate) {
-        this.licenceStartDate = licenceStartDate;
+    public void setStartDate(String startDate) {
+        this.startDate = startDate;
     }
 
-    public String getLicenceEndDate() {
-        return licenceEndDate;
+    public String getEndDate() {
+        return endDate;
     }
 
-    public void setLicenceEndDate(String licenceEndDate) {
-        this.licenceEndDate = licenceEndDate;
+    public void setEndDate(String endDate) {
+        this.endDate = endDate;
     }
 
-    public String getLicencePeriod() {
-        return licencePeriod;
+    public int getPeriodTypeId() {
+        return periodTypeId;
     }
 
-    public void setLicencePeriod(String licencePeriod) {
-        this.licencePeriod = licencePeriod;
+    public void setPeriodTypeId(int periodTypeId) {
+        this.periodTypeId = periodTypeId;
     }
 
-    public String getLicenceDuration() {
-        return licenceDuration;
+    public String getPeriod() {
+        return period;
     }
 
-    public void setLicenceDuration(String licenceDuration) {
-        this.licenceDuration = licenceDuration;
+    public void setPeriod(String period) {
+        this.period = period;
     }
 
-    public String getLicenceInPerpetuity() {
-        return licenceInPerpetuity;
+    public int getDuration() {
+        return duration;
     }
 
-    public void setLicenceInPerpetuity(String licenceInPerpetuity) {
-        this.licenceInPerpetuity = licenceInPerpetuity;
+    public void setDuration(int duration) {
+        this.duration = duration;
     }
 
-    public int getId() {
-        return id;
+    public boolean isInPerpetuity() {
+        return inPerpetuity;
     }
 
-    public void setId(int id) {
-        this.id = id;
+    public void setInPerpetuity(boolean inPerpetuity) {
+        this.inPerpetuity = inPerpetuity;
     }
-
-    public boolean isActivate() {
-        return activate;
-    }
-
-    public void setActivate(boolean activate) {
-        this.activate = activate;
-    }
-
-    public boolean isDeactivate() {
-        return deactivate;
-    }
-
-    public void setDeactivate(boolean deactivate) {
-        this.deactivate = deactivate;
-    }
-
-    public boolean isSave() {
-        return save;
-    }
-
-    public void setSave(boolean save) {
-        this.save = save;
-    }
-    
-
 }

@@ -5,6 +5,9 @@
  */
 package com.radicalsac.logic;
 
+import com.easycoop.radical.database.layer.entity.Cooperative;
+import com.easycoop.radical.database.layer.entity.CooperativeLicense;
+import com.easycoop.radical.database.layer.entity.PeriodType;
 import com.radicalsac.models.CooperativeApplication;
 import com.radicalsac.models.CooperativeLicenceActivation;
 import com.radicalsac.models.CooperativeDetails;
@@ -12,7 +15,9 @@ import com.radicalsac.models.ForwardMemberApplication;
 import com.radicalsac.models.MemberCooperativeApplication;
 import com.radicalsac.models.MemberProfile;
 import com.radicalsac.models.SystemAdminProfile;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import org.exchangepoint.resource.EmailSender;
 import org.greenpole.entity.response.Response;
@@ -28,6 +33,7 @@ public class SystemAdministratorCategory {
 
     private final EmailSender sender = new EmailSender();
     private static final Logger logger = LoggerFactory.getLogger(SystemAdministratorCategory.class);
+    private final Util util = new Util();
 
     /**
      * Request to create system administrator account
@@ -149,14 +155,8 @@ public class SystemAdministratorCategory {
             } else if (coopDetails.getCountry() == null || coopDetails.getCountry().trim().isEmpty()) {
                 desc += "\nCountry must be specified.";
                 flag = true;
-            } else if (coopDetails.getLoanPayOffAllowed() == null || coopDetails.getLoanPayOffAllowed().trim().isEmpty()) {
-                desc += "\nLoan payoff option must be either YES or NO.";
-                flag = true;
             } else if (coopDetails.getContributionFrequency() == null || coopDetails.getContributionFrequency().trim().isEmpty()) {
                 desc += "\nFrequency of contribution must be specified.";
-                flag = true;
-            } else if (coopDetails.getOverrideMemContribFreq() == null || coopDetails.getOverrideMemContribFreq().trim().isEmpty()) {
-                desc += "\nOverride member contribution frequency can either be YES or NO.";
                 flag = true;
             } else if (coopDetails.getContibutionCurrency() == null || coopDetails.getContibutionCurrency().trim().isEmpty()) {
                 desc += "\nContribution currency must be specified.";
@@ -166,9 +166,6 @@ public class SystemAdministratorCategory {
                 flag = true;
             } else if (coopDetails.getContributionAmount() <= 0) {
                 desc += "\nContribution amount is improperly set.";
-                flag = true;
-            } else if (coopDetails.getOverrideMemberContributionAmount() == null || coopDetails.getOverrideMemberContributionAmount().trim().isEmpty()) {
-                desc += "\nOverride member contribution amount option must be specified.";
                 flag = true;
             } else {
                 flag = false;
@@ -193,12 +190,12 @@ public class SystemAdministratorCategory {
                 coop_profile_hib.setState(coopDetails.getState());
                 coop_profile_hib.setCountry(coopDetails.getCountry());
                 coop_profile_hib.setInterestRate(coopDetails.getInterestRate());
-                coop_profile_hib.setLoanPayOffAllowed(coopDetails.getLoanPayOffAllowed());
                 coop_profile_hib.setContributionFrequency(coopDetails.getContributionFrequency());
-                coop_profile_hib.setOverrideMemContribFreq(coopDetails.getOverrideMemContribFreq());
                 coop_profile_hib.setContibutionCurrency(coopDetails.getContibutionCurrency());
                 coop_profile_hib.setContributionAmount(coopDetails.getContributionAmount());
-                coop_profile_hib.setOverrideMemberContributionAmount(coopDetails.getOverrideMemberContributionAmount());
+                coop_profile_hib.setOverrideMemContribFreq(coopDetails.isOverrideMemContribFreq());
+                coop_profile_hib.setLoanPayOffAllowed(coopDetails.isLoanPayOffAllowed());
+                coop_profile_hib.setOverrideMemberContributionAmount(coopDetails.isOverrideMemberContributionAmount());
                 //call hibernate method to create system administrator
                 boolean created = false;
                 if (created) {
@@ -309,12 +306,9 @@ public class SystemAdministratorCategory {
                 coop_model.setState(coop.getState());
                 coop_model.setCountry(coop.getCountry());
                 coop_model.setInterestRate(coop.getInterestRate());
-                coop_model.setLoanPayOffAllowed(coop.getLoanPayOffAllowed());
                 coop_model.setContributionFrequency(coop.getContributionFrequency());
-                coop_model.setOverrideMemContribFreq(coop.getOverrideMemContribFreq());
                 coop_model.setContibutionCurrency(coop.getContibutionCurrency());
                 coop_model.setContributionAmount(coop.getContributionAmount());
-                coop_model.setOverrideMemberContributionAmount(coop.getOverrideMemberContributionAmount());
                 coop_list_out.add(coop_model);
             }
             resp.setRetn(0);
@@ -367,14 +361,8 @@ public class SystemAdministratorCategory {
             } else if (coopDetails.getCountry() == null || coopDetails.getCountry().trim().isEmpty()) {
                 desc += "\nCountry must be specified.";
                 flag = true;
-            } else if (coopDetails.getLoanPayOffAllowed() == null || coopDetails.getLoanPayOffAllowed().trim().isEmpty()) {
-                desc += "\nLoan payoff option must be either YES or NO.";
-                flag = true;
             } else if (coopDetails.getContributionFrequency() == null || coopDetails.getContributionFrequency().trim().isEmpty()) {
                 desc += "\nFrequency of contribution must be specified.";
-                flag = true;
-            } else if (coopDetails.getOverrideMemContribFreq() == null || coopDetails.getOverrideMemContribFreq().trim().isEmpty()) {
-                desc += "\nOverride member contribution frequency can either be YES or NO.";
                 flag = true;
             } else if (coopDetails.getContibutionCurrency() == null || coopDetails.getContibutionCurrency().trim().isEmpty()) {
                 desc += "\nContribution currency must be specified.";
@@ -384,9 +372,6 @@ public class SystemAdministratorCategory {
                 flag = true;
             } else if (coopDetails.getContributionAmount() <= 0) {
                 desc += "\nContribution amount is improperly set.";
-                flag = true;
-            } else if (coopDetails.getOverrideMemberContributionAmount() == null || coopDetails.getOverrideMemberContributionAmount().trim().isEmpty()) {
-                desc += "\nOverride member contribution amount option must be specified.";
                 flag = true;
             } else {
                 flag = false;
@@ -411,12 +396,12 @@ public class SystemAdministratorCategory {
                 coop_profile_hib.setState(coopDetails.getState());
                 coop_profile_hib.setCountry(coopDetails.getCountry());
                 coop_profile_hib.setInterestRate(coopDetails.getInterestRate());
-                coop_profile_hib.setLoanPayOffAllowed(coopDetails.getLoanPayOffAllowed());
+                coop_profile_hib.setLoanPayOffAllowed(coopDetails.isLoanPayOffAllowed());
                 coop_profile_hib.setContributionFrequency(coopDetails.getContributionFrequency());
-                coop_profile_hib.setOverrideMemContribFreq(coopDetails.getOverrideMemContribFreq());
+                coop_profile_hib.setOverrideMemContribFreq(coopDetails.isOverrideMemContribFreq());
                 coop_profile_hib.setContibutionCurrency(coopDetails.getContibutionCurrency());
                 coop_profile_hib.setContributionAmount(coopDetails.getContributionAmount());
-                coop_profile_hib.setOverrideMemberContributionAmount(coopDetails.getOverrideMemberContributionAmount());
+                coop_profile_hib.setOverrideMemberContributionAmount(coopDetails.isOverrideMemberContributionAmount());
                 //call hibernate method to create system administrator
                 boolean created = false;
                 if (created) {
@@ -453,62 +438,6 @@ public class SystemAdministratorCategory {
             logger.error("Error creating cooperative - [" + login.getUserId() + "]", ex);
             return resp;
         }
-    }
-
-    /**
-     * Request to change cooperative activation status
-     *
-     * @param login the logged in user
-     * @param cooperativeActivation cooperative activation details
-     * @return response to change cooperative activation status
-     */
-    public Response changeCooperativeActivationStatus_Request(Login login, CooperativeLicenceActivation cooperativeActivation) {
-        Response resp = new Response();
-        logger.info("Request to edit cooperative, invoked by [{}]", login.getUserId());
-        try {
-            if (!true) {//replace with check for cooperative exist
-                resp.setRetn(300);
-                resp.setDesc("The specified cooperative does not exist.");
-                logger.info("The specified cooperative {} does not exist. [{}]", cooperativeActivation.getCooperativeId(), login.getUserId());
-                return resp;
-            }
-            if (cooperativeActivation.isSave()) {
-                CooperativeDetails coop_details = new CooperativeDetails();//replace with hibernate method to get object
-                if (coop_details.isActive()) {
-                    CooperativeLicenceActivation coop_licence_hib = new CooperativeLicenceActivation();
-                    coop_licence_hib.setCooperativeId(cooperativeActivation.getCooperativeId());
-                    coop_licence_hib.setLicenceStartDate(cooperativeActivation.getLicenceStartDate());
-                    coop_licence_hib.setLicenceEndDate(cooperativeActivation.getLicenceEndDate());
-                    coop_licence_hib.setLicenceDuration(cooperativeActivation.getLicenceDuration());
-                    coop_licence_hib.setLicencePeriod(cooperativeActivation.getLicencePeriod());
-                    coop_licence_hib.setLicenceInformation(cooperativeActivation.getLicenceInformation());
-                    coop_licence_hib.setLicenceInPerpetuity(cooperativeActivation.getLicenceInPerpetuity());
-
-                    boolean created = false;
-                    if (created) {
-
-                        List<SystemAdminProfile> all_system_admin_hib = new ArrayList<>(); //call hibernate method here
-                        List<String> admin_emails = new ArrayList<>();
-                        for (SystemAdminProfile email : all_system_admin_hib) {
-                            admin_emails.add(email.getEmail());
-                        }
-                        String subject = "Cooperative creation";
-                        String emailBody = "<p>The system has successfully created the cooperative with</p>\n";
-                        sender.sendBulkEmail("email@gmail.com", "password", admin_emails, subject, emailBody);
-                        logger.info("Email sent to admin(s) {}, for cooperative account creation. [{}]", admin_emails, login.getUserId());
-
-                        //send notification message here
-                        resp.setRetn(0);
-                        resp.setDesc("Cooperative created successfully.");
-                        return resp;
-
-                    }
-                }
-            }
-
-        } catch (Exception ex) {
-        }
-        return resp;
     }
 
     /**
@@ -785,9 +714,8 @@ public class SystemAdministratorCategory {
                             + "<p><strong>[" + cooperative_administrator + "]</strong></p>";
                     sender.sendBulkEmail("email@gmail.com", "password", admin_emails, subject, emailBody);
                     logger.info("Email sent to system admin(s) {}, for system admin account creation. [{}]", admin_emails, login.getUserId());
-                    
-                    //send email to CAC here
 
+                    //send email to CAC here
                     resp.setRetn(0);
                     resp.setDesc("Member request to join cooperative forwarded successfully.");
                     return resp;
@@ -805,6 +733,480 @@ public class SystemAdministratorCategory {
             resp.setDesc("General Error: Unable to forward member application to join cooperative to cooperative admin. Contact system administrator." + "\nMessage: " + ex.getMessage());
             logger.info("Error forwarding member application to join cooperative to cooperative admin. See error log. [{}] - [{}]", resp.getRetn(), login.getUserId());
             logger.error("Error forwarding member application to join cooperative to cooperative admin - [" + login.getUserId() + "]", ex);
+            return resp;
+        }
+    }
+
+    /**
+     * Request to forward member request to join cooperative to cooperative
+     * administrator
+     *
+     * @param login the logged in user
+     * @return response to the forward member application request
+     */
+    public Response remindCooperativeAdminOnForwardedApplications_Request(Login login) {
+        Response resp = new Response();
+        logger.info("Request to cooperative admin on forwarded applications, invoked by [{}]", login.getUserId());
+
+        String desc = "";
+        boolean flag = false;
+        int index = 0;
+
+        try {
+
+            if (flag) {
+
+            } else {
+
+                List<ForwardMemberApplication> forwarded_requests_from_hib = new ArrayList<>();//get all forwarded request not treated
+                List<MemberProfile> all_system_admin_hib = new ArrayList<>(); //call hibernate method here to get all system admin
+                List<String> admin_emails = new ArrayList<>();
+                List<String> cooperative_names = new ArrayList<>();
+                List<String> cooperative_administrator = new ArrayList<>();
+
+//                for (ForwardMemberApplication requestToForward : requestToForwards) {
+//                    cooperative_names.add(requestToForward.getNameOfCooperative());
+//                    cooperative_administrator.add(requestToForward.getCooperativeAdminUsername());
+//
+//                    ForwardMemberApplication forwardMemberApplication_hib = new ForwardMemberApplication();
+//                    forwardMemberApplication_hib.setCooperativeId(requestToForward.getCooperativeId());
+//                    forwardMemberApplication_hib.setCooperativeAdminUsername(requestToForward.getCooperativeAdminUsername());
+//                    forwardMemberApplication_hib.setAdditionalInfo(requestToForward.getAdditionalInfo());
+//                    forwardMemberApplication_hib.setDateOfForwarding("");//replace with current date
+//                    forwardMemberApplication_hib.setForwardedBy(login.getUserId());
+//                    forwarded_requests_from hib
+//                    .add(forwardMemberApplication_hib);
+//                }
+                boolean created = false;//call hibernate method to save request forwarding
+                if (created) {
+
+                    for (MemberProfile email : all_system_admin_hib) {
+                        admin_emails.add(email.getEmailAddress());
+                    }
+
+                    String subject = "Member Application to Join Cooperative Forwarded.";
+                    String emailBody = "<p>The system has successfully forwarded member request to join the cooperatives "
+                            + "[" + cooperative_names + "], to their respective cooperative admin with username </p>\n"
+                            + "<p><strong>[" + cooperative_administrator + "]</strong></p>";
+                    sender.sendBulkEmail("email@gmail.com", "password", admin_emails, subject, emailBody);
+                    logger.info("Email sent to system admin(s) {}, for system admin account creation. [{}]", admin_emails, login.getUserId());
+
+                    //send email to CAC here
+                    resp.setRetn(0);
+                    resp.setDesc("Member request to join cooperative forwarded successfully.");
+                    return resp;
+
+                } else {
+                    resp.setRetn(300);
+                    resp.setDesc("Unable to forward member request to join cooperative due to error, please contact system administrator.");
+                    logger.info("Unable to forward member request to join cooperative due to error, please contact system administrator. [{}] ", login.getUserId());
+                    return resp;
+                }
+
+            }
+        } catch (Exception ex) {
+            resp.setRetn(99);
+            resp.setDesc("General Error: Unable to forward member application to join cooperative to cooperative admin. Contact system administrator." + "\nMessage: " + ex.getMessage());
+            logger.info("Error forwarding member application to join cooperative to cooperative admin. See error log. [{}] - [{}]", resp.getRetn(), login.getUserId());
+            logger.error("Error forwarding member application to join cooperative to cooperative admin - [" + login.getUserId() + "]", ex);
+            return resp;
+        }
+        return null;
+    }
+
+    /**
+     * Request to save cooperative license
+     *
+     * @param login the logged in user
+     * @param licenceDetails the cooperative details
+     * @return response to the save cooperative license request
+     */
+    public Response saveCooperativeLicense_Request(Login login, CooperativeLicenceActivation licenceDetails) {
+        Response resp = new Response();
+        logger.info("Request to save cooperative license, invoked by [{}]", login.getUserId());
+        SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
+
+        try {
+            if (!true) {//replace with a check for if cooperative exist
+                resp.setRetn(300);
+                resp.setDesc("The specified cooperative does not exist.");
+                logger.info("The specified cooperative {}, does not exist. - [{}] ", licenceDetails.getCooperativeId(), login.getUserId());
+                return resp;
+            }
+
+            List<MemberProfile> all_system_admin_hib = new ArrayList<>(); //call hibernate method here to get all system admin
+            List<String> admin_emails = new ArrayList<>();
+            for (MemberProfile email : all_system_admin_hib) {
+                admin_emails.add(email.getEmailAddress());
+            }
+
+            String subject = "Cooperative Licence Activation.";
+            String emailBody = "<p>The licence for the cooperative [" + licenceDetails.getCooperativeName() + "]"
+                    + ", has been saved successfully.</p>";
+
+            Cooperative coop = new Cooperative();//get cooperative by ID 
+            CooperativeLicense coop_licence_hib;
+            PeriodType period = new PeriodType();
+            if (!licenceDetails.isInPerpetuity()) {
+                period = new PeriodType();//replace with hibernate method
+            }
+
+            if (true) {//replace with a check for if cooperative has been activated already
+                //cooperative is active already, extend licence information
+                coop_licence_hib = new CooperativeLicense();//get cooperative existing licence by ID
+                Date existingEndDate = coop_licence_hib.getEndDate();//change to the period set from the front
+                coop_licence_hib.setLicenseInformation("");//Is this like some random generated string?
+
+                if (licenceDetails.isInPerpetuity()) {
+                    coop_licence_hib.setInPerpetuity(licenceDetails.isInPerpetuity());
+                    coop_licence_hib.setDuration(0);
+                    coop_licence_hib.setStartDate(null);
+                    coop_licence_hib.setEndDate(null);
+                    coop_licence_hib.setPeriodType(null);
+
+                } else {
+
+                    coop_licence_hib.setInPerpetuity(false);
+                    coop_licence_hib.setDuration(licenceDetails.getDuration());
+                    coop_licence_hib.setPeriodType(period);
+
+                    Date newLicencePeriod = formatter.parse(licenceDetails.getEndDate());//change to whatever new period is sent from the front
+                    long daysDiff = util.returnDateDiffInDays(existingEndDate, newLicencePeriod);
+                    String newEndDate = util.addNumberOfDaysToDate(formatter.format(existingEndDate), daysDiff);
+                    coop_licence_hib.setEndDate(formatter.parse(newEndDate));
+                }
+
+                boolean save = false;//replace with method to save licence information
+                if (save) {
+
+                    sender.sendBulkEmail("email@gmail.com", "password", admin_emails, subject, emailBody);
+                    logger.info("Email sent to system admin(s) {} for licence activation, for system admin account creation. [{}]", admin_emails, login.getUserId());
+
+                    //send notification to system admins here
+                    resp.setRetn(0);
+                    resp.setDesc("Licence activation was successful.");
+                    return resp;
+                } else {
+                    resp.setRetn(300);
+                    resp.setDesc("Cooperative licence extension failed, please contact system administrator");
+                    logger.info("Cooperative licence extension failed, please contact system administrator. [{}] ", login.getUserId());
+                    return resp;
+                }
+
+            } else {
+                //cooperative has not been activated
+                if (!true) {//replace with a check for if cooperative has members
+                    resp.setRetn(300);
+                    resp.setDesc("The specified cooperative does not have any member");
+                    logger.info("The specified cooperative {}, does not have any member. - [{}] ", licenceDetails.getCooperativeId(), login.getUserId());
+                    return resp;
+                }
+                coop_licence_hib = new CooperativeLicense();
+
+                coop_licence_hib.setLicenseInformation("");//Is this like some random generated string?
+                coop_licence_hib.setCooperative(coop);
+                if (licenceDetails.isInPerpetuity()) {
+                    coop_licence_hib.setInPerpetuity(licenceDetails.isInPerpetuity());
+                    coop_licence_hib.setDuration(0);
+                    coop_licence_hib.setStartDate(null);
+                    coop_licence_hib.setEndDate(null);
+                    coop_licence_hib.setPeriodType(null);
+
+                } else {
+                    coop_licence_hib.setInPerpetuity(false);
+                    coop_licence_hib.setDuration(licenceDetails.getDuration());
+                    coop_licence_hib.setPeriodType(period);
+                    coop_licence_hib.setStartDate(new Date());
+
+                    Date licensePeriod = formatter.parse(licenceDetails.getEndDate());//change to whatever new period is sent from the front
+                    long daysDiff = util.returnDateDiffInDays(new Date(), licensePeriod);
+                    String newLicenseEndDate = util.addNumberOfDaysToDate(formatter.format(new Date()), daysDiff);
+                    coop_licence_hib.setEndDate(formatter.parse(newLicenseEndDate));
+                }
+
+                boolean save = false;//replace with method to save licence information
+                if (save) {
+
+                    sender.sendBulkEmail("email@gmail.com", "password", admin_emails, subject, emailBody);
+                    logger.info("Email sent to system admin(s) {} for licence activation, for system admin account creation. [{}]", admin_emails, login.getUserId());
+
+                    //send notification to system admins here
+                    resp.setRetn(0);
+                    resp.setDesc("Licence activation was successful.");
+                    return resp;
+                } else {
+                    resp.setRetn(300);
+                    resp.setDesc("Cooperative licence saving failed, please contact system administrator");
+                    logger.info("Cooperative licence saving failed, please contact system administrator. [{}] ", login.getUserId());
+                    return resp;
+                }
+
+            }
+
+        } catch (Exception ex) {
+            resp.setRetn(99);
+            resp.setDesc("General Error: Unable to create cooperative. Contact system administrator." + "\nMessage: " + ex.getMessage());
+            logger.info("Error saving cooperative license. See error log. [{}] - [{}]", resp.getRetn(), login.getUserId());
+            logger.error("Error saving cooperative license - [" + login.getUserId() + "]", ex);
+            return resp;
+        }
+    }
+
+    /**
+     * Request to activate cooperative license
+     *
+     * @param login the logged in user
+     * @param licenceDetails the cooperative details
+     * @return response to the activate cooperative license request
+     */
+    public Response activateCooperativeLicense_Request(Login login, CooperativeLicenceActivation licenceDetails) {
+        Response resp = new Response();
+        logger.info("Request to activate cooperative license, invoked by [{}]", login.getUserId());
+        SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
+
+        try {
+            if (!true) {//replace with a check for if cooperative exist
+                resp.setRetn(300);
+                resp.setDesc("The specified cooperative does not exist.");
+                logger.info("The specified cooperative {}, does not exist. - [{}] ", licenceDetails.getCooperativeId(), login.getUserId());
+                return resp;
+            }
+
+            if (!true) {//replace with a check for if cooperative has members
+                resp.setRetn(300);
+                resp.setDesc("The specified cooperative does not have any member");
+                logger.info("The specified cooperative {}, does not have any member. - [{}] ", licenceDetails.getCooperativeId(), login.getUserId());
+                return resp;
+            }
+
+            Cooperative coop = new Cooperative();//get cooperative by ID 
+            CooperativeLicense coop_licence_hib = new CooperativeLicense();
+            PeriodType period = new PeriodType();
+            if (!licenceDetails.isInPerpetuity()) {
+                period = new PeriodType();//replace with hibernate method
+            }
+
+            coop_licence_hib.setLicenseInformation("");//Is this like some random generated string?
+            coop_licence_hib.setCooperative(coop);
+            if (licenceDetails.isInPerpetuity()) {
+                coop_licence_hib.setInPerpetuity(licenceDetails.isInPerpetuity());
+                coop_licence_hib.setDuration(0);
+                coop_licence_hib.setStartDate(null);
+                coop_licence_hib.setEndDate(null);
+                coop_licence_hib.setPeriodType(null);
+
+            } else {
+                coop_licence_hib.setInPerpetuity(false);
+                coop_licence_hib.setDuration(licenceDetails.getDuration());
+                coop_licence_hib.setPeriodType(period);
+                coop_licence_hib.setStartDate(new Date());
+
+                Date newLicencePeriod = formatter.parse(licenceDetails.getEndDate());//change to whatever new period is sent from the front
+                long daysDiff = util.returnDateDiffInDays(new Date(), newLicencePeriod);
+                String newEndDate = util.addNumberOfDaysToDate(formatter.format(new Date()), daysDiff);
+                coop_licence_hib.setEndDate(formatter.parse(newEndDate));
+            }
+
+            boolean save = false;//replace with method to save licence information
+            if (save) {
+                List<MemberProfile> all_system_admin_hib = new ArrayList<>(); //call hibernate method here to get all system admin
+                List<String> admin_emails = new ArrayList<>();
+                for (MemberProfile email : all_system_admin_hib) {
+                    admin_emails.add(email.getEmailAddress());
+                }
+
+                String subject = "Cooperative Licence Activation.";
+                String emailBody = "<p>The licence for the cooperative [" + licenceDetails.getCooperativeName() + "]"
+                        + ", has been activated successfully.</p>";
+
+                sender.sendBulkEmail("email@gmail.com", "password", admin_emails, subject, emailBody);
+                logger.info("Email sent to system admin(s) {} for licence activation, for system admin account creation. [{}]", admin_emails, login.getUserId());
+
+                //send notification to system admins here
+                resp.setRetn(0);
+                resp.setDesc("Licence activation was successful.");
+                return resp;
+            } else {
+                resp.setRetn(300);
+                resp.setDesc("Cooperative licence activation failed, please contact system administrator");
+                logger.info("Cooperative licence activation failed, please contact system administrator. [{}] ", login.getUserId());
+                return resp;
+            }
+
+        } catch (Exception ex) {
+            resp.setRetn(99);
+            resp.setDesc("General Error: Unable to activate cooperative license. Contact system administrator." + "\nMessage: " + ex.getMessage());
+            logger.info("Error activating cooperative license. See error log. [{}] - [{}]", resp.getRetn(), login.getUserId());
+            logger.error("Error activating cooperative license - [" + login.getUserId() + "]", ex);
+            return resp;
+        }
+    }
+
+    /**
+     * Request to deactivate cooperative license
+     *
+     * @param login the logged in user
+     * @param licenceDetails the cooperative details
+     * @return response to the deactivate cooperative license request
+     */
+    public Response deactivateCooperativeLicense_Request(Login login, CooperativeLicenceActivation licenceDetails) {
+        Response resp = new Response();
+        logger.info("Request to deactivate cooperative license, invoked by [{}]", login.getUserId());
+
+        try {
+            if (!true) {//replace with a check for if cooperative exist
+                resp.setRetn(300);
+                resp.setDesc("The specified cooperative does not exist.");
+                logger.info("The specified cooperative {}, does not exist. - [{}] ", licenceDetails.getCooperativeId(), login.getUserId());
+                return resp;
+            }
+
+            if (!true) {//replace with a check for if cooperative license exist
+                resp.setRetn(300);
+                resp.setDesc("The specified cooperative does not have the specified license");
+                logger.info("The specified cooperative {}, does not have the specified license. - [{}] ", licenceDetails.getCooperativeId(), login.getUserId());
+                return resp;
+            }
+
+            CooperativeLicense coop_licence_hib = new CooperativeLicense();//get cooperating existing licence by ID
+            coop_licence_hib.setStartDate(null);
+            coop_licence_hib.setEndDate(null);
+            coop_licence_hib.setDuration(0);
+            //coop_licence_hib     set flag to deactivate license here
+            //call hibernate method to deactivate cooperative license / all members and shutdown running loans and every other transactions
+            boolean deactivated = false;
+
+            List<MemberProfile> all_system_admin_hib = new ArrayList<>(); //call hibernate method here to get all system admin
+            List<String> admin_emails = new ArrayList<>();
+            for (MemberProfile email : all_system_admin_hib) {
+                admin_emails.add(email.getEmailAddress());
+            }
+
+            String subject = "Cooperative Licence Deactivation.";
+            String emailBody = "<p>The licence for the cooperative [" + licenceDetails.getCooperativeName() + "]"
+                    + ", has been deaactivated successfully.</p>";
+
+            if (deactivated) {
+                sender.sendBulkEmail("email@gmail.com", "password", admin_emails, subject, emailBody);
+                logger.info("Email sent to system admin(s) {} for licence deactivation, for system admin account creation. [{}]", admin_emails, login.getUserId());
+                //send notification to system admins here
+                resp.setRetn(0);
+                resp.setDesc("Licence deactivation was successful.");
+                return resp;
+            } else {
+                resp.setRetn(300);
+                resp.setDesc("Cooperative licence deactivation failed, please contact system administrator");
+                logger.info("Cooperative licence deactivation failed, please contact system administrator. [{}] ", login.getUserId());
+                return resp;
+            }
+
+        } catch (Exception ex) {
+            resp.setRetn(99);
+            resp.setDesc("General Error: Unable to deactivation cooperative license. Contact system administrator." + "\nMessage: " + ex.getMessage());
+            logger.info("Error deactivating cooperative license. See error log. [{}] - [{}]", resp.getRetn(), login.getUserId());
+            logger.error("Error deactivating cooperative license - [" + login.getUserId() + "]", ex);
+            return resp;
+        }
+    }
+
+    /**
+     * Request to query all licenses of a cooperative
+     *
+     * @param login the logged in user
+     * @param cooperativeId the cooperative ID
+     * @return response to the query cooperative licenses request
+     */
+    public Response queryCooperativeLicenceByCoopId_Request(Login login, int cooperativeId) {
+        Response resp = new Response();
+        logger.info("Request to query cooperative licence(s) by , invoked by [{}]", login.getUserId());
+
+        try {
+            SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
+            if (!true) {//replace with checkCooperativeExist(cooperativeId)
+                resp.setRetn(301);
+                resp.setDesc("The specified cooperative does not exist, please contact system administrator.");
+                logger.info("The specified cooperative [{}] does not exist, please contact system administrator. [{}] ", cooperativeId, login.getUserId());
+                return resp;
+            }
+
+            List<CooperativeLicense> coop_licence_hib = new ArrayList<>();//rerplace with hibernate method
+            List<CooperativeLicenceActivation> coop_licence_model_out = new ArrayList<>();
+            CooperativeDetails coop_hib = new CooperativeDetails();//replace with query to get cooperative by ID
+
+            for (CooperativeLicense licence : coop_licence_hib) {
+                CooperativeLicenceActivation coop_activation_model = new CooperativeLicenceActivation();
+
+                coop_activation_model.setCooperativeName(coop_hib.getName());
+                coop_activation_model.setDuration(licence.getDuration());
+                coop_activation_model.setEndDate(formatter.format(licence.getEndDate()));
+                coop_activation_model.setStartDate(formatter.format(licence.getStartDate()));
+                coop_activation_model.setId(licence.getId());
+                coop_activation_model.setInPerpetuity(licence.getInPerpetuity());
+                coop_activation_model.setLicenceInformation(licence.getLicenseInformation());
+                coop_activation_model.setPeriodTypeId(licence.getPeriodType().getId());
+                coop_licence_model_out.add(coop_activation_model);
+            }
+
+            resp.setRetn(0);
+            resp.setDesc("Cooperative licence queried successfully.");
+            resp.setBody(coop_licence_model_out);
+            logger.info("Cooperative licence queried successfully. [{}] ", login.getUserId());
+            return resp;
+        } catch (Exception ex) {
+            resp.setRetn(99);
+            resp.setDesc("General Error: Unable to query cooperative licence. Contact system administrator." + "\nMessage: " + ex.getMessage());
+            logger.info("Error querying cooperative licence. See error log. [{}] - [{}]", resp.getRetn(), login.getUserId());
+            logger.error("Error querying cooperative licence - [" + login.getUserId() + "]", ex);
+            return resp;
+        }
+    }
+
+    /**
+     * Request to query all licenses of a cooperative
+     *
+     * @param login the logged in user
+     * @param licenseId the license ID
+     * @return response to the query cooperative license by ID request
+     */
+    public Response queryCooperativeLicenceByLicenseId_Request(Login login, int licenseId) {
+        Response resp = new Response();
+        logger.info("Request to query cooperative licence(s) by license ID , invoked by [{}]", login.getUserId());
+
+        try {
+            SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
+            if (!true) {//replace with checkIfLicenseExist
+                resp.setRetn(301);
+                resp.setDesc("The specified cooperative license does not exist, please contact system administrator.");
+                logger.info("The specified cooperative license [{}] does not exist, please contact system administrator. [{}] ", licenseId, login.getUserId());
+                return resp;
+            }
+
+            CooperativeLicense licence = new CooperativeLicense();//rerplace with hibernate method to get license by ID
+            List<CooperativeLicenceActivation> coop_licence_model_out = new ArrayList<>();
+            CooperativeDetails coop_hib = new CooperativeDetails();//replace with query to get cooperative by ID
+
+            CooperativeLicenceActivation coop_activation_model = new CooperativeLicenceActivation();
+
+            coop_activation_model.setCooperativeName(coop_hib.getName());
+            coop_activation_model.setDuration(licence.getDuration());
+            coop_activation_model.setEndDate(formatter.format(licence.getEndDate()));
+            coop_activation_model.setStartDate(formatter.format(licence.getStartDate()));
+            coop_activation_model.setId(licence.getId());
+            coop_activation_model.setInPerpetuity(licence.getInPerpetuity());
+            coop_activation_model.setLicenceInformation(licence.getLicenseInformation());
+            coop_activation_model.setPeriodTypeId(licence.getPeriodType().getId());
+            coop_licence_model_out.add(coop_activation_model);
+
+            resp.setRetn(0);
+            resp.setDesc("Cooperative licence queried successfully.");
+            resp.setBody(coop_licence_model_out);
+            logger.info("Cooperative licence queried successfully. [{}] ", login.getUserId());
+            return resp;
+        } catch (Exception ex) {
+            resp.setRetn(99);
+            resp.setDesc("General Error: Unable to query cooperative licence by the ID. Contact system administrator." + "\nMessage: " + ex.getMessage());
+            logger.info("Error querying cooperative licence by the ID. See error log. [{}] - [{}]", resp.getRetn(), login.getUserId());
+            logger.error("Error querying cooperative licence by the ID - [" + login.getUserId() + "]", ex);
             return resp;
         }
     }

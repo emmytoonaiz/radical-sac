@@ -21,12 +21,12 @@ public class CooperativeDetails {
     private String state;
     private String country;
     private double interestRate;
-    private String loanPayOffAllowed;
+    private boolean loanPayOffAllowed;
     private String contributionFrequency;
-    private String overrideMemContribFreq;
+    private boolean overrideMemContribFreq;
     private String contibutionCurrency;
     private double contributionAmount;
-    private String overrideMemberContributionAmount;
+    private boolean overrideMemberContributionAmount;
     private boolean active;
     private String fullAddress;
 
@@ -112,12 +112,12 @@ public class CooperativeDetails {
     public void setInterestRate(double interestRate) {
         this.interestRate = interestRate;
     }
-    
-    public String getLoanPayOffAllowed() {
+
+    public boolean isLoanPayOffAllowed() {
         return loanPayOffAllowed;
     }
 
-    public void setLoanPayOffAllowed(String loanPayOffAllowed) {
+    public void setLoanPayOffAllowed(boolean loanPayOffAllowed) {
         this.loanPayOffAllowed = loanPayOffAllowed;
     }
 
@@ -127,6 +127,14 @@ public class CooperativeDetails {
 
     public void setContributionFrequency(String contributionFrequency) {
         this.contributionFrequency = contributionFrequency;
+    }
+
+    public boolean isOverrideMemContribFreq() {
+        return overrideMemContribFreq;
+    }
+
+    public void setOverrideMemContribFreq(boolean overrideMemContribFreq) {
+        this.overrideMemContribFreq = overrideMemContribFreq;
     }
 
     public String getContibutionCurrency() {
@@ -145,6 +153,14 @@ public class CooperativeDetails {
         this.contributionAmount = contributionAmount;
     }
 
+    public boolean isOverrideMemberContributionAmount() {
+        return overrideMemberContributionAmount;
+    }
+
+    public void setOverrideMemberContributionAmount(boolean overrideMemberContributionAmount) {
+        this.overrideMemberContributionAmount = overrideMemberContributionAmount;
+    }
+
     public boolean isActive() {
         return active;
     }
@@ -161,20 +177,4 @@ public class CooperativeDetails {
         this.fullAddress = fullAddress;
     }
 
-    public String getOverrideMemContribFreq() {
-        return overrideMemContribFreq;
-    }
-
-    public void setOverrideMemContribFreq(String overrideMemContribFreq) {
-        this.overrideMemContribFreq = overrideMemContribFreq;
-    }
-
-    public String getOverrideMemberContributionAmount() {
-        return overrideMemberContributionAmount;
-    }
-
-    public void setOverrideMemberContributionAmount(String overrideMemberContributionAmount) {
-        this.overrideMemberContributionAmount = overrideMemberContributionAmount;
-    }
-    
 }
